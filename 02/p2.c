@@ -13,7 +13,7 @@ int main (int argc, char **argv) {
 
     char buffer[BSIZE];
     char signs[] = " ,.-:";
-    int game_nr = 0, lines = 0;
+    int lines = 0;
     
 
     while (fgets(buffer, BSIZE, in) != NULL) {
@@ -22,8 +22,6 @@ int main (int argc, char **argv) {
         // pozyskuje: nazwe, nr gry
         temp_buffer = strtok(buffer, signs);
         temp_buffer = strtok(NULL, signs);
-    
-        ++game_nr;
 
         int red = 0, green = 0, blue = 0;
         while( 1 ) {
