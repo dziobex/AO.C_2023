@@ -56,6 +56,8 @@ int main( int argc, char **argv ) {
 
         ++row;
     }
+    
+    fclose( in );
 
     int sum = 0;
     for ( int i = 0; i < s_set.length; ++i ) {

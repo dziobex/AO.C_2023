@@ -48,6 +48,8 @@ int main( int argc, char **argv ) {
 
         if ( wins != 0 )
             wins_sum += pow( 2, wins - 1 );
+        
+        free( tmp_buff );
     }
 
     fclose( in );

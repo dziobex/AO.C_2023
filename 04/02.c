@@ -50,6 +50,8 @@ int main( int argc, char **argv ) {
         for ( int i = current_card + 1; i <= current_card + wins; ++i )
             cards_stock[ i ] += cards_stock[ current_card ];
         current_card++;
+
+        free( tmp_buff );
     }
 
     fclose( in );

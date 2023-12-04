@@ -52,6 +52,8 @@ int main (int argc, char **argv) {
 
         free (temp_buffer);
     }
+    
+    fclose( in );
 
     printf("%i\n", lines);
 
