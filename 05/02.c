@@ -4,7 +4,7 @@
 #include <ctype.h>
 
 #define BSIZE 300
-#define ll long long
+#define ll unsigned long long
 
 typedef struct {
     ll a, b;
@@ -23,8 +23,14 @@ int translate( range seeds[1000], int seed_index,  range trans, int step, int *s
         return 0;
 
     if ( current_seed.a >= trans.a && current_seed.b <= trans.b ) {
+        current_seed.b = current_seed.b - current_seed.a;
         current_seed.a = step + current_seed.a - trans.a;
-        current_seed.b = step + current_seed.b - trans.a;
+        current_seed.b += current_seed.a;
+        
+    // printf("\t%llu--%llu\t", trans.a, trans.b);
+    
+        if ( current_seed.a == 42 )
+            printf("[%llu, %llu]", current_seed.a, current_seed.b);
 
         new_seeds[ *new_seeds_count ] = current_seed;
         (*new_seeds_count)++;
@@ -50,9 +56,9 @@ int translate( range seeds[1000], int seed_index,  range trans, int step, int *s
 
     if ( current_seed.a < trans.a && current_seed.b <= trans.b ) {
         range new_one;
-        new_one.a = step + current_seed.a - trans.a;
-        new_one.b = new_one.a + trans.b - trans.a;
-
+        new_one.a = step;
+        new_one.b = new_one.a + current_seed.b - trans.a;
+        
         current_seed.b = trans.a -1;
         seeds[ seed_index ] = current_seed;
         new_seeds[ *new_seeds_count ] = new_one;
@@ -63,11 +69,12 @@ int translate( range seeds[1000], int seed_index,  range trans, int step, int *s
 
     new_seeds[ *new_seeds_count ] = trans;
     (*new_seeds_count)++;
+    
 
     range new_one;
-    new_one.a = trans.b;
+    new_one.a = trans.b + 1;
         new_one.b = new_one.a + trans.b - trans.a;
-    current_seed.b = trans.a;
+    current_seed.b = trans.a - 1;
 
     seeds[ seed_index ] = current_seed;
     seeds[*seeds_count] = new_one;
@@ -164,13 +171,14 @@ int main( int argc, char **argv ) {
         printf("\n");
     }
 
-    ll min = seeds[0].a;
+    ll min_e = seeds[0].a;
 
-    for (int i = 0; i < seeds_count; ++i)
-        if (seeds[i].a < min)
-            min = seeds[i].a;
+    for (int i = 0; i < seeds_count; ++i) {
+        if (seeds[i].a < min_e)
+            min_e = seeds[i].a;
+    }
     
-    printf("%llu\n", min);
+    printf("\n%llu\n", min_e);
 
     fclose( in );
 
