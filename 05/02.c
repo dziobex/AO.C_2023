@@ -19,15 +19,15 @@ int intersects( range st, range nd ) {
 int translate( range seeds[1000], int seed_index,  range trans, int step, int *seeds_count, range new_seeds[1000], int *new_seeds_count ) {
     range current_seed = seeds[ seed_index ];
 
+    /* totalnie nie zwiazane ze soba przedzialy */
     if ( intersects( current_seed, trans ) == 0)
         return 0;
 
+    /* caly przedzial znajduje sie w przedziale przenoszalnym - przeniesc! */
     if ( current_seed.a >= trans.a && current_seed.b <= trans.b ) {
-        current_seed.b = current_seed.b - current_seed.a;
-        current_seed.a = step + current_seed.a - trans.a;
-        current_seed.b += current_seed.a;
         
-    // printf("\t%llu--%llu\t", trans.a, trans.b);
+        current_seed.a = ( current_seed.a - trans.a ) + step;
+        current_seed.b = ( current_seed.b - trans.a ) + step;
     
         if ( current_seed.a == 42 )
             printf("[%llu, %llu]", current_seed.a, current_seed.b);
@@ -38,13 +38,15 @@ int translate( range seeds[1000], int seed_index,  range trans, int step, int *s
         for (int i = seed_index; i < *seeds_count - 1; ++i)
             seeds[i] = seeds[i + 1];
         --(*seeds_count);
+
         return 1;
     }
 
+    /* czesc przedzialu - caly od poczatku do pewnego momentu - do przeniesienia! */
     if ( trans.a <= current_seed.a && trans.b < current_seed.b ) {
         range new_one;
-        new_one.a = step + current_seed.a - trans.a;
-        new_one.b = new_one.a + trans.b - current_seed.a;
+        new_one.a = ( current_seed.a - trans.a ) + step;
+        new_one.b = ( trans.b - trans.a ) + step;
 
         current_seed.a = trans.b + 1;
         seeds[ seed_index ] = current_seed;
@@ -54,12 +56,14 @@ int translate( range seeds[1000], int seed_index,  range trans, int step, int *s
         return 0;
     }
 
+    /* czesc przedzialu - od pewnego poczatku do calego konca - do przeniesienia! */
     if ( current_seed.a < trans.a && current_seed.b <= trans.b ) {
         range new_one;
         new_one.a = step;
-        new_one.b = new_one.a + current_seed.b - trans.a;
+        new_one.b = ( current_seed.b - trans.a ) + step;
         
-        current_seed.b = trans.a -1;
+        current_seed.b = trans.a - 1;
+
         seeds[ seed_index ] = current_seed;
         new_seeds[ *new_seeds_count ] = new_one;
         (*new_seeds_count)++;
@@ -67,13 +71,15 @@ int translate( range seeds[1000], int seed_index,  range trans, int step, int *s
         return 0;
     }
 
-    new_seeds[ *new_seeds_count ] = trans;
+    /* czesc przenoszalna znajduje sie w srodku przedzialu - przeniesc ta przenoszalna, reszte oddzielic, zostawic! */
+
+    new_seeds[ *new_seeds_count ].a = step;
+    new_seeds[ *new_seeds_count ].b = trans.b - trans.a + step;
     (*new_seeds_count)++;
     
-
     range new_one;
     new_one.a = trans.b + 1;
-        new_one.b = new_one.a + trans.b - trans.a;
+    new_one.b = current_seed.b;
     current_seed.b = trans.a - 1;
 
     seeds[ seed_index ] = current_seed;
@@ -84,7 +90,7 @@ int translate( range seeds[1000], int seed_index,  range trans, int step, int *s
 }
 
 int main( int argc, char **argv ) {
-    FILE *in = fopen( "sample.txt", "r" );
+    FILE *in = fopen( "in.txt", "r" );
 
     if ( in == NULL )
         return fputs("Nie mozna zaladowac pliku!", stderr), EXIT_FAILURE;
@@ -117,7 +123,7 @@ int main( int argc, char **argv ) {
     }
     fgets( buffer, BSIZE, in); // biore zagubionego next linea
 
-    // printf("%i\n", seeds_count);
+    printf("%i\n", seeds_count);
 
     while ( fgets( buffer, BSIZE, in) != NULL ) {
         
@@ -151,7 +157,7 @@ int main( int argc, char **argv ) {
                 // --i
 
                 if ( translate(seeds, i, translation, map[0], &seeds_count, next_gen, &new_seeds_count ) == 1)
-                    --i;
+                    i = 0;
             }
 
 
@@ -165,10 +171,9 @@ int main( int argc, char **argv ) {
         }
 
         for (int i = 0; i < seeds_count; ++i) {
-            
             printf("%llu-%llu ", seeds[i].a, seeds[i].b);
         }
-        printf("\n");
+        printf("\n\n");
     }
 
     ll min_e = seeds[0].a;
