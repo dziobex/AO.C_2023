@@ -4,8 +4,7 @@
 
 #define BUFFER_SIZE 150
 #define MATRIX_SIZE 150
-#define min_a_b(a, b) (((a) < (b)) ? (a) : (b))
-
+#define minimum( a, b ) ( ( (a) < (b) ) ? (a) : (b) )
 
 typedef struct node node;
 
@@ -55,7 +54,7 @@ node *pop_node(node_stack *stack) {
 
 int main( int argc, char **argv ) {
 
-    FILE *in = fopen( "sample_03.txt", "r" );
+    FILE *in = fopen( "in.txt", "r" );
 
     if ( in == NULL )
         return EXIT_FAILURE;
@@ -74,7 +73,6 @@ int main( int argc, char **argv ) {
             buffer[ --line_size ] = '\0';
         
         for( int i = 0; i < line_size; ++i ) {
-            
             init_node(&matrix[ lines ][ i ], buffer[ i ], NULL, NULL, NULL, NULL );
             if ( buffer[i] == 'S' )
                 s_node = &matrix[ lines ][ i ]; 
@@ -88,24 +86,20 @@ int main( int argc, char **argv ) {
         for( int x = 0; x < line; ++x ) {
             node *top = NULL;
             if ( y > 0  && strchr("F|7", matrix[ y - 1 ][ x ].label ) != NULL
-                && (matrix[ y ][ x ].label == 'S' || strchr("L|J", matrix[ y ][ x ].label)  != NULL) ) {
+                && (matrix[ y ][ x ].label == 'S' || strchr("L|J", matrix[ y ][ x ].label)  != NULL) )
                 top = &matrix[ y - 1][ x ];
-            }
             node *right = NULL;
             if ( x + 1 < line && strchr( "J-7", matrix[ y ][x + 1].label ) != NULL
-                && (matrix[ y ][ x ].label == 'S' || strchr( "L-F", matrix[ y ][ x ].label) != NULL )) {
+                && (matrix[ y ][ x ].label == 'S' || strchr( "L-F", matrix[ y ][ x ].label) != NULL ))
                 right = &matrix[ y ][ x + 1 ];
-            }
             node *bottom = NULL;
             if ( y + 1 < lines && strchr( "L|J", matrix[ y + 1 ][ x ].label ) != NULL
-                && (matrix[ y ][ x ].label == 'S' || strchr("F|7", matrix[ y ][ x ].label ) != NULL) ) {
+                && (matrix[ y ][ x ].label == 'S' || strchr("F|7", matrix[ y ][ x ].label ) != NULL) )
                 bottom = &matrix[ y + 1 ][ x ];
-            }
             node *left = NULL;
             if ( x > 0 && strchr( "L-F", matrix[ y ][ x - 1 ].label ) != NULL
-                && (matrix[ y ][ x ].label == 'S' || strchr( "J-7", matrix[ y ][x ].label ) != NULL)) {
+                && (matrix[ y ][ x ].label == 'S' || strchr( "J-7", matrix[ y ][x ].label ) != NULL))
                 left = &matrix[ y ][ x - 1 ];
-            }
             init_node(&matrix[ y ][ x ], matrix[ y ][ x ].label, top, right, bottom, left );
         }
     }
@@ -123,8 +117,9 @@ int main( int argc, char **argv ) {
         }
     }
 
-    int step = 1;
-    int max = 0;
+    /* ---- PART 1 ---- */
+
+    int step = 1, max = 0;
 
     while ( stack_one.size > 0 || stack_two.size > 0 ) {
 
@@ -161,21 +156,49 @@ int main( int argc, char **argv ) {
         ++step;
     }
 
-    int rope = 1;
+    /* ---- PART 2 ---- */
+
+    int inside_rope = 0;
+
+    /* put start node in rope nodes crowd (it loses its unique identity!) */
+    char change = '|'; // top + bottom
+
+    if ( s_node->dirs[0] != NULL && s_node->dirs[1] != NULL )
+        change = 'L';
+    else if ( s_node->dirs[0] != NULL && s_node->dirs[3] != NULL )
+        change = 'J';
+    else if ( s_node->dirs[1] != NULL && s_node->dirs[3] != NULL )
+        change = '-';
+    else if ( s_node->dirs[2] != NULL && s_node->dirs[3] != NULL )
+        change = '7';
+    else if ( s_node->dirs[2] != NULL && s_node->dirs[1] != NULL )
+        change = 'F';
+
+    s_node->label = change;
+    s_node->path_one = s_node->path_two = 0;
 
     for ( int y = 0; y < lines; ++y ) {
         for ( int x = 0; x < line; ++x ) {
-            if (matrix[y][x].path_one != -1 && matrix[y][x].path_two != -1) {
-                ++rope;
-                printf("%i\t", min_a_b(matrix[y][x].path_one, matrix[y][x].path_two));
+            int part_of_rope = minimum( matrix[y][x].path_one, matrix[y][x].path_two ) != -1;
+            
+            if ( part_of_rope == 1 || matrix[y][x].label == 'S')
+                continue;
+            
+            int in_rope = 0;
+
+            for ( int z = 0; z < x; ++z ) {
+                int por = minimum( matrix[y][z].path_one, matrix[y][z].path_two ) != -1;
+
+                if ( por != 0 && strchr( "|F7", matrix[y][z].label ) != NULL)
+                    ++in_rope;
             }
-            else
-            printf(".\t");
+            
+            if ( in_rope % 2 != 0 )
+                inside_rope++;
         }
-        printf("\n");
     }
 
-    printf("%i", rope);
+    printf("01: %i\n02: %i\n", max, inside_rope);
     
     return EXIT_SUCCESS;
 }
