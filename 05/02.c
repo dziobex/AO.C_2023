@@ -16,7 +16,7 @@ int intersects( range st, range nd ) {
     return 1;
 }
 
-int translate( range seeds[1000], int seed_index,  range trans, int step, int *seeds_count, range new_seeds[1000], int *new_seeds_count ) {
+int translate( range seeds[1000], int seed_index,  range trans, ll step, int *seeds_count, range new_seeds[1000], int *new_seeds_count ) {
     range current_seed = seeds[ seed_index ];
 
     /* totalnie nie zwiazane ze soba przedzialy */
@@ -24,13 +24,10 @@ int translate( range seeds[1000], int seed_index,  range trans, int step, int *s
         return 0;
 
     /* caly przedzial znajduje sie w przedziale przenoszalnym - przeniesc! */
-    if ( current_seed.a >= trans.a && current_seed.b <= trans.b ) {
-        
+    if ( trans.a <= current_seed.a && current_seed.b <= trans.b ) {
+
         current_seed.a = ( current_seed.a - trans.a ) + step;
         current_seed.b = ( current_seed.b - trans.a ) + step;
-    
-        if ( current_seed.a == 42 )
-            printf("[%llu, %llu]", current_seed.a, current_seed.b);
 
         new_seeds[ *new_seeds_count ] = current_seed;
         (*new_seeds_count)++;
@@ -123,13 +120,11 @@ int main( int argc, char **argv ) {
     }
     fgets( buffer, BSIZE, in); // biore zagubionego next linea
 
-    printf("%i\n", seeds_count);
-
     while ( fgets( buffer, BSIZE, in) != NULL ) {
         
         seeds;
         int new_seeds_count = 0;
-        range next_gen[1000];
+        range next_gen[1000] = {};
 
         while ( fgets( buffer, BSIZE, in) != NULL && buffer[0] != '\n' ) {
             int last_digit = strlen( buffer ) - 1;
@@ -150,17 +145,10 @@ int main( int argc, char **argv ) {
             translation.a = map[1];
             translation.b = map[1] + map[2] - 1;
 
-
             // for loop, pozamieniaj
-            for ( int i = 0; i < seeds_count; ++i) {
-                // if deleted
-                // --i
-
+            for ( int i = 0; i < seeds_count; ++i)
                 if ( translate(seeds, i, translation, map[0], &seeds_count, next_gen, &new_seeds_count ) == 1)
-                    i = 0;
-            }
-
-
+                    --i;
             free( dig_numbers );
         }
 
@@ -169,21 +157,15 @@ int main( int argc, char **argv ) {
             seeds_count++;
 
         }
-
-        for (int i = 0; i < seeds_count; ++i) {
-            printf("%llu-%llu ", seeds[i].a, seeds[i].b);
-        }
-        printf("\n\n");
     }
 
     ll min_e = seeds[0].a;
 
-    for (int i = 0; i < seeds_count; ++i) {
+    for (int i = 0; i < seeds_count; ++i)
         if (seeds[i].a < min_e)
             min_e = seeds[i].a;
-    }
     
-    printf("\n%llu\n", min_e);
+    printf( "%llu", min_e );
 
     fclose( in );
 
