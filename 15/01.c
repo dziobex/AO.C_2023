@@ -5,7 +5,7 @@
 #define BUFFER_SIZE 25000
 
 int main( int argc, char **argv ) {
-    FILE *in = fopen( "in.txt", "r" );
+    FILE *in = fopen( "input.txt", "r" );
     if ( in == NULL )
         return fprintf( stderr, "Nie udalo sie otworzyc pliku!" ), EXIT_FAILURE;
     
