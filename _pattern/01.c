@@ -6,9 +6,13 @@
 
 int main( int argc, char **argv ) {
     FILE *in = fopen( "sample.txt", "r" );
+
     if ( in == NULL )
         return fprintf( stderr, "Nie udalo sie otworzyc pliku :(" ), EXIT_FAILURE;
+
+    char buffer[ BUFFER_SIZE ];
+
     fclose( in );
 
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
