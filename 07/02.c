@@ -33,7 +33,6 @@ int calculate_type( char hand[H_SIZE] ) {
     int where_max = 0;
     for ( int i = 0; i < 100; ++i) {
         if ( i != 'J' && monitor[i] > max) {
-            
             max = monitor[i];
             where_max = i;
         }
@@ -43,13 +42,13 @@ int calculate_type( char hand[H_SIZE] ) {
 
     max += monitor['J'];
     
-    if ( max >= 4)
+    if ( max >= 4 )
         return max + 2; // czyli typy 6, 7
-    if ( max == 3 && min == 2)
+    if ( max == 3 && min == 2 )
         return 5;
-    if (max == 3 && min == 1)
+    if ( max == 3 && min == 1 )
         return 4;
-    if (min == 1 && max == 1)
+    if ( min == 1 && max == 1 )
         return 1;
     
     int count_pairs = 0;
@@ -74,7 +73,6 @@ int cmp_cards(const void *c1, const void *c2) {
         else if (compare[card_1->hand[i]] < compare[card_2->hand[i]])
             return -1;
     }
-
     return 0;
 }
 
